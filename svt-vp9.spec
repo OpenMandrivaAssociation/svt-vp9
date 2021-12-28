@@ -5,7 +5,7 @@
 %define oname   SVT-VP9
 
 Name:           svt-vp9
-Version:        0.8.7
+Version:        0.3.0
 Release:        1
 Summary:        Scalable Video Technology for VP9 Encoder and Decoder
 Group:          System/Libraries
