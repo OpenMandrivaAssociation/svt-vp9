@@ -44,6 +44,13 @@ Requires:	%{libpackage} = %{EVRD}
 %description -n %{devpackage}
 This package contains the development files for SVT-VP9.
 
+%package -n     gstreamer1.0-%{name}
+Summary:        GStreamer 1.0 %{name}-based plug-in
+Requires:       gstreamer1.0-plugins-base
+
+%description -n gstreamer1.0-%{name}
+This package provides %{name}-based GStreamer plug-in.
+
 
 %prep
 %autosetup -p1 -n %{oname}-v%{version}
