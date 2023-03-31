@@ -6,7 +6,7 @@
 
 Name:           svt-vp9
 Version:        0.3.0
-Release:        1
+Release:        2
 Summary:        Scalable Video Technology for VP9 Encoder and Decoder
 Group:          System/Libraries
 License:        BSD-2-Clause-Patent and ISC
