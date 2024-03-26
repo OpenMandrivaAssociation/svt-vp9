@@ -4,6 +4,9 @@
 
 %define oname   SVT-VP9
 
+# https://github.com/OpenVisualCloud/SVT-VP9/issues/159
+ExclusiveArch:  %{x86_64}
+
 Name:           svt-vp9
 Version:        0.3.0
 Release:        3
