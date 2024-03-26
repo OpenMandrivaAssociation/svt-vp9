@@ -1,0 +1,212 @@
+From d46acba4668817b2963fa55546a7b4f565c66120 Mon Sep 17 00:00:00 2001
+From: Victoria <victoria.zhislina@intel.com>
+Date: Thu, 18 Mar 2021 05:55:54 +0300
+Subject: [PATCH] ffmpeg: Add target socket option (#140)
+
+Signed-off-by: Zhislina <Victoria.Zhislina@intel.com>
+---
+ .../0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch  | 10 ++++++++--
+ ...r-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch | 11 ++++++++---
+ ...3-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch | 11 ++++++++---
+ ...1-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch | 11 ++++++++---
+ 4 files changed, 32 insertions(+), 11 deletions(-)
+
+diff --git a/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch b/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch
+index e095c21..6fefcc9 100644
+--- a/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch
++++ b/ffmpeg_plugin/0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch
+@@ -12,7 +12,7 @@ Signed-off-by: Guo Jiansheng <jiansheng.guo@intel.com>
+  libavcodec/Makefile       |   1 +
+  libavcodec/allcodecs.c    |   1 +
+  libavcodec/avcodec.h      |   2 +
+- libavcodec/libsvt_vp9.c   | 481 ++++++++++++++++++++++++++++++++++++++
++ libavcodec/libsvt_vp9.c   | 487 ++++++++++++++++++++++++++++++++++++++
+  libavformat/dashenc.c     |  49 +++-
+  libavformat/ivfenc.c      |  34 ++-
+  libavformat/matroskaenc.c | 108 ++++++++-
+@@ -98,7 +98,7 @@ new file mode 100644
+ index 0000000000..037467366e
+ --- /dev/null
+ +++ b/libavcodec/libsvt_vp9.c
+-@@ -0,0 +1,481 @@
++@@ -0,0 +1,487 @@
+ +/*
+ +* Scalable Video Technology for VP9 encoder library plugin
+ +*
+@@ -157,6 +157,8 @@ index 0000000000..037467366e
+ +    int tune;
+ +    int qp;
+ +
+++    int target_socket;
+++
+ +    int forced_idr;
+ +
+ +    int level;
+@@ -270,6 +272,7 @@ index 0000000000..037467366e
+ +    param->tune                     = svt_enc->tune;
+ +    param->base_layer_switch_mode   = svt_enc->base_layer_switch_mode;
+ +    param->qp                       = svt_enc->qp;
+++    param->target_socket            = svt_enc->target_socket;
+ +
+ +    param->target_bit_rate          = avctx->bit_rate;
+ +    if (avctx->gop_size > 0)
+@@ -538,6 +541,9 @@ index 0000000000..037467366e
+ +    { "qp", "QP value for intra frames", OFFSET(qp),
+ +      AV_OPT_TYPE_INT, { .i64 = 32 }, 0, 51, VE },
+ +
+++    { "socket", "Target CPU socket to use.  -1 use all available", OFFSET(target_socket),
+++     AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 1, VE },
+++
+ +    { "bl_mode", "Random Access Prediction Structure type setting", OFFSET(base_layer_switch_mode),
+ +      AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, VE },
+ +
+diff --git a/ffmpeg_plugin/master-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch b/ffmpeg_plugin/master-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch
+index 55ed954..f7f3cf2 100644
+--- a/ffmpeg_plugin/master-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch
++++ b/ffmpeg_plugin/master-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch
+@@ -12,7 +12,7 @@ Signed-off-by: Guo Jiansheng <jiansheng.guo@intel.com>
+  libavcodec/Makefile       |   1 +
+  libavcodec/allcodecs.c    |   1 +
+  libavcodec/avcodec.h      |   4 +
+- libavcodec/libsvt_vp9.c   | 509 ++++++++++++++++++++++++++++++++++++++
++ libavcodec/libsvt_vp9.c   | 514 ++++++++++++++++++++++++++++++++++++++
+  libavformat/dashenc.c     |  49 +++-
+  libavformat/ivfenc.c      |  30 ++-
+  libavformat/matroskaenc.c | 104 +++++++-
+@@ -100,7 +100,7 @@ new file mode 100644
+ index 0000000000..a557019c9b
+ --- /dev/null
+ +++ b/libavcodec/libsvt_vp9.c
+-@@ -0,0 +1,509 @@
++@@ -0,0 +1,514 @@
+ +/*
+ +* Scalable Video Technology for VP9 encoder library plugin
+ +*
+@@ -164,6 +164,8 @@ index 0000000000..a557019c9b
+ +    int tune;
+ +    int qp;
+ +
+++    int target_socket;
+++
+ +    int forced_idr;
+ +
+ +    int level;
+@@ -277,7 +279,7 @@ index 0000000000..a557019c9b
+ +    param->tune                     = svt_enc->tune;
+ +    param->base_layer_switch_mode   = svt_enc->base_layer_switch_mode;
+ +    param->qp                       = svt_enc->qp;
+-+
+++    param->target_socket            = svt_enc->target_socket;
+ +    param->target_bit_rate          = avctx->bit_rate;
+ +    if (avctx->gop_size > 0)
+ +        param->intra_period  = avctx->gop_size - 1;
+@@ -566,6 +568,9 @@ index 0000000000..a557019c9b
+ +    { "qp", "QP value for intra frames", OFFSET(qp),
+ +      AV_OPT_TYPE_INT, { .i64 = 32 }, 0, 51, VE },
+ +
+++    { "socket", "Target CPU socket to use.  -1 use all available", OFFSET(target_socket),
+++      AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 1, VE },
+++
+ +    { "bl_mode", "Random Access Prediction Structure type setting", OFFSET(base_layer_switch_mode),
+ +      AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, VE },
+ +
+diff --git a/ffmpeg_plugin/n4.2.3-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch b/ffmpeg_plugin/n4.2.3-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch
+index f8d1387..a9e2c2a 100644
+--- a/ffmpeg_plugin/n4.2.3-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch
++++ b/ffmpeg_plugin/n4.2.3-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch
+@@ -12,7 +12,7 @@ Signed-off-by: Guo Jiansheng <jiansheng.guo@intel.com>
+  libavcodec/Makefile       |   1 +
+  libavcodec/allcodecs.c    |   1 +
+  libavcodec/avcodec.h      |   2 +
+- libavcodec/libsvt_vp9.c   | 481 ++++++++++++++++++++++++++++++++++++++
++ libavcodec/libsvt_vp9.c   | 486 ++++++++++++++++++++++++++++++++++++++
+  libavformat/dashenc.c     |  49 +++-
+  libavformat/ivfenc.c      |  34 ++-
+  libavformat/matroskaenc.c | 112 ++++++++-
+@@ -98,7 +98,7 @@ new file mode 100644
+ index 0000000000..037467366e
+ --- /dev/null
+ +++ b/libavcodec/libsvt_vp9.c
+-@@ -0,0 +1,481 @@
++@@ -0,0 +1,486 @@
+ +/*
+ +* Scalable Video Technology for VP9 encoder library plugin
+ +*
+@@ -157,6 +157,8 @@ index 0000000000..037467366e
+ +    int tune;
+ +    int qp;
+ +
+++    int target_socket;
+++
+ +    int forced_idr;
+ +
+ +    int level;
+@@ -270,7 +272,7 @@ index 0000000000..037467366e
+ +    param->tune                     = svt_enc->tune;
+ +    param->base_layer_switch_mode   = svt_enc->base_layer_switch_mode;
+ +    param->qp                       = svt_enc->qp;
+-+
+++    param->target_socket            = svt_enc->target_socket;
+ +    param->target_bit_rate          = avctx->bit_rate;
+ +    if (avctx->gop_size > 0)
+ +        param->intra_period  = avctx->gop_size - 1;
+@@ -538,6 +540,9 @@ index 0000000000..037467366e
+ +    { "qp", "QP value for intra frames", OFFSET(qp),
+ +      AV_OPT_TYPE_INT, { .i64 = 32 }, 0, 51, VE },
+ +
+++    { "socket", "Target CPU socket to use.  -1 use all available", OFFSET(target_socket),
+++      AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 1, VE },
+++
+ +    { "bl_mode", "Random Access Prediction Structure type setting", OFFSET(base_layer_switch_mode),
+ +      AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, VE },
+ +
+diff --git a/ffmpeg_plugin/n4.3.1-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch b/ffmpeg_plugin/n4.3.1-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch
+index 1fb38fc..32da01c 100644
+--- a/ffmpeg_plugin/n4.3.1-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch
++++ b/ffmpeg_plugin/n4.3.1-0001-Add-ability-for-ffmpeg-to-run-svt-vp9.patch
+@@ -12,7 +12,7 @@ Signed-off-by: Guo Jiansheng <jiansheng.guo@intel.com>
+  libavcodec/Makefile       |   1 +
+  libavcodec/allcodecs.c    |   1 +
+  libavcodec/avcodec.h      |   4 +
+- libavcodec/libsvt_vp9.c   | 509 ++++++++++++++++++++++++++++++++++++++
++ libavcodec/libsvt_vp9.c   | 514 ++++++++++++++++++++++++++++++++++++++
+  libavformat/dashenc.c     |  49 +++-
+  libavformat/ivfenc.c      |  30 ++-
+  libavformat/matroskaenc.c | 104 +++++++-
+@@ -100,7 +100,7 @@ new file mode 100644
+ index 0000000000..a557019c9b
+ --- /dev/null
+ +++ b/libavcodec/libsvt_vp9.c
+-@@ -0,0 +1,509 @@
++@@ -0,0 +1,514 @@
+ +/*
+ +* Scalable Video Technology for VP9 encoder library plugin
+ +*
+@@ -164,6 +164,8 @@ index 0000000000..a557019c9b
+ +    int tune;
+ +    int qp;
+ +
+++    int target_socket;
+++
+ +    int forced_idr;
+ +
+ +    int level;
+@@ -277,7 +279,7 @@ index 0000000000..a557019c9b
+ +    param->tune                     = svt_enc->tune;
+ +    param->base_layer_switch_mode   = svt_enc->base_layer_switch_mode;
+ +    param->qp                       = svt_enc->qp;
+-+
+++    param->target_socket            = svt_enc->target_socket;
+ +    param->target_bit_rate          = avctx->bit_rate;
+ +    if (avctx->gop_size > 0)
+ +        param->intra_period  = avctx->gop_size - 1;
+@@ -566,6 +568,9 @@ index 0000000000..a557019c9b
+ +    { "qp", "QP value for intra frames", OFFSET(qp),
+ +      AV_OPT_TYPE_INT, { .i64 = 32 }, 0, 51, VE },
+ +
+++    { "socket", "Target CPU socket to use.  -1 use all available", OFFSET(target_socket),
+++      AV_OPT_TYPE_INT, { .i64 = -1 }, -1, 1, VE },
+++
+ +    { "bl_mode", "Random Access Prediction Structure type setting", OFFSET(base_layer_switch_mode),
+ +      AV_OPT_TYPE_BOOL, { .i64 = 0 }, 0, 1, VE },
+ +

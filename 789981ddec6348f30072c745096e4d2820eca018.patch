@@ -1,0 +1,25 @@
+From 789981ddec6348f30072c745096e4d2820eca018 Mon Sep 17 00:00:00 2001
+From: Jun <tianjun1.0@gmail.com>
+Date: Wed, 17 Mar 2021 19:53:43 -0700
+Subject: [PATCH] Add missing default interface values (#141)
+
+Signed-off-by: Jun Tian <jun.tian@intel.com>
+---
+ Source/Lib/Codec/EbEncHandle.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/Source/Lib/Codec/EbEncHandle.c b/Source/Lib/Codec/EbEncHandle.c
+index 6b78339..679bb55 100644
+--- a/Source/Lib/Codec/EbEncHandle.c
++++ b/Source/Lib/Codec/EbEncHandle.c
+@@ -1692,8 +1692,8 @@ EbErrorType eb_vp9_svt_enc_init_parameter(
+     config_ptr->asm_type = 1;
+ 
+     // Channel info
+-    //config_ptr->logicalProcessors = 0;
+-    //config_ptr->target_socket = -1;
++    config_ptr->logical_processors = 0;
++    config_ptr->target_socket = -1;
+     config_ptr->channel_id = 0;
+     config_ptr->active_channel_count = 1;
+ 

@@ -1,0 +1,110 @@
+From 1b08a141204b500e64458c1a92f95b3898013674 Mon Sep 17 00:00:00 2001
+From: Christopher Degawa <christopher.degawa@intel.com>
+Date: Tue, 9 Aug 2022 13:34:59 -0500
+Subject: [PATCH] vpx_subtract_block: prefix with svt_ to prevent conflict with
+ libvpx (#158)
+
+Signed-off-by: Christopher Degawa <christopher.degawa@intel.com>
+---
+ Source/Lib/ASM_SSE2/subtract_sse2.asm | 2 +-
+ Source/Lib/VPX/vp9_encoder.c          | 6 +++---
+ Source/Lib/VPX/vp9_rdopt.c            | 6 +++---
+ Source/Lib/VPX/vpx_dsp_rtcd.h         | 6 +++---
+ 4 files changed, 10 insertions(+), 10 deletions(-)
+
+diff --git a/Source/Lib/ASM_SSE2/subtract_sse2.asm b/Source/Lib/ASM_SSE2/subtract_sse2.asm
+index eb297eb..2e634e1 100644
+--- a/Source/Lib/ASM_SSE2/subtract_sse2.asm
++++ b/Source/Lib/ASM_SSE2/subtract_sse2.asm
+@@ -12,7 +12,7 @@
+ 
+ SECTION .text
+ 
+-; void vpx_subtract_block(int rows, int cols,
++; void svt_vpx_subtract_block(int rows, int cols,
+ ;                         int16_t *diff, ptrdiff_t diff_stride,
+ ;                         const uint8_t *src, ptrdiff_t src_stride,
+ ;                         const uint8_t *pred, ptrdiff_t pred_stride)
+diff --git a/Source/Lib/VPX/vp9_encoder.c b/Source/Lib/VPX/vp9_encoder.c
+index f4afa78..58b1079 100644
+--- a/Source/Lib/VPX/vp9_encoder.c
++++ b/Source/Lib/VPX/vp9_encoder.c
+@@ -5752,7 +5752,7 @@ void mode_estimation(VP9_COMP *cpi, MACROBLOCK *x, MACROBLOCKD *xd,
+     eb_vp9_predict_intra_block(xd, eb_vp9_b_width_log2_lookup[bsize], tx_size, mode, src,
+                             src_stride, dst, dst_stride, 0, 0, 0);
+ 
+-    vpx_subtract_block(bh, bw, src_diff, bw, src, src_stride, dst, dst_stride);
++    svt_vpx_subtract_block(bh, bw, src_diff, bw, src, src_stride, dst, dst_stride);
+ 
+     wht_fwd_txfm(src_diff, bw, coeff, tx_size);
+ 
+@@ -5805,7 +5805,7 @@ void mode_estimation(VP9_COMP *cpi, MACROBLOCK *x, MACROBLOCKD *xd,
+           ref_frame[rf_idx]->y_buffer + mb_y_offset,
+           ref_frame[rf_idx]->y_stride, &predictor[0], bw, &mv.as_mv, sf, bw, bh,
+           0, kernel, MV_PRECISION_Q3, mi_col * MI_SIZE, mi_row * MI_SIZE);
+-      vpx_subtract_block(bh, bw, src_diff, bw,
++      svt_vpx_subtract_block(bh, bw, src_diff, bw,
+                          xd->cur_buf->y_buffer + mb_y_offset,
+                          xd->cur_buf->y_stride, &predictor[0], bw);
+     }
+@@ -5814,7 +5814,7 @@ void mode_estimation(VP9_COMP *cpi, MACROBLOCK *x, MACROBLOCKD *xd,
+                               ref_frame[rf_idx]->y_stride, &predictor[0], bw,
+                               &mv.as_mv, sf, bw, bh, 0, kernel, MV_PRECISION_Q3,
+                               mi_col * MI_SIZE, mi_row * MI_SIZE);
+-    vpx_subtract_block(bh, bw, src_diff, bw,
++    svt_vpx_subtract_block(bh, bw, src_diff, bw,
+                        xd->cur_buf->y_buffer + mb_y_offset,
+                        xd->cur_buf->y_stride, &predictor[0], bw);
+ #endif
+diff --git a/Source/Lib/VPX/vp9_rdopt.c b/Source/Lib/VPX/vp9_rdopt.c
+index e842fc9..078b023 100644
+--- a/Source/Lib/VPX/vp9_rdopt.c
++++ b/Source/Lib/VPX/vp9_rdopt.c
+@@ -1088,7 +1088,7 @@ static int64_t rd_pick_intra4x4block(VP9_COMP *cpi, MACROBLOCK *x, int row,
+         eb_vp9_predict_intra_block(xd, 1, TX_4X4, mode, x->skip_encode ? src : dst,
+                                 x->skip_encode ? src_stride : dst_stride, dst,
+                                 dst_stride, col + idx, row + idy, 0);
+-        vpx_subtract_block(4, 4, src_diff, 8, src, src_stride, dst, dst_stride);
++        svt_vpx_subtract_block(4, 4, src_diff, 8, src, src_stride, dst, dst_stride);
+ 
+         if (xd->lossless) {
+           const scan_order *so = &eb_vp9_default_scan_orders[TX_4X4];
+@@ -1529,12 +1529,12 @@ static int64_t encode_inter_mb_segment(VP9_COMP *cpi, MACROBLOCK *x,
+         height, width, vp9_raster_block_offset_int16(BLOCK_8X8, i, p->src_diff),
+         8, src, p->src.stride, dst, pd->dst.stride, xd->bd);
+   } else {
+-    vpx_subtract_block(height, width,
++    svt_vpx_subtract_block(height, width,
+                        vp9_raster_block_offset_int16(BLOCK_8X8, i, p->src_diff),
+                        8, src, p->src.stride, dst, pd->dst.stride);
+   }
+ #else
+-  vpx_subtract_block(height, width,
++  svt_vpx_subtract_block(height, width,
+                      vp9_raster_block_offset_int16(BLOCK_8X8, i, p->src_diff),
+                      8, src, p->src.stride, dst, pd->dst.stride);
+ #endif  // CONFIG_VP9_HIGHBITDEPTH
+diff --git a/Source/Lib/VPX/vpx_dsp_rtcd.h b/Source/Lib/VPX/vpx_dsp_rtcd.h
+index a0e7098..fb7a19c 100644
+--- a/Source/Lib/VPX/vpx_dsp_rtcd.h
++++ b/Source/Lib/VPX/vpx_dsp_rtcd.h
+@@ -843,7 +843,7 @@ RTCD_EXTERN uint32_t(*vpx_sub_pixel_variance8x8)(const uint8_t *src_ptr, int sou
+ #endif
+ void eb_vp9_subtract_block_c(int rows, int cols, int16_t *diff_ptr, ptrdiff_t diff_stride, const uint8_t *src_ptr, ptrdiff_t src_stride, const uint8_t *pred_ptr, ptrdiff_t pred_stride);
+ void eb_vp9_subtract_block_sse2(int rows, int cols, int16_t *diff_ptr, ptrdiff_t diff_stride, const uint8_t *src_ptr, ptrdiff_t src_stride, const uint8_t *pred_ptr, ptrdiff_t pred_stride);
+-RTCD_EXTERN void(*vpx_subtract_block)(int rows, int cols, int16_t *diff_ptr, ptrdiff_t diff_stride, const uint8_t *src_ptr, ptrdiff_t src_stride, const uint8_t *pred_ptr, ptrdiff_t pred_stride);
++RTCD_EXTERN void(*svt_vpx_subtract_block)(int rows, int cols, int16_t *diff_ptr, ptrdiff_t diff_stride, const uint8_t *src_ptr, ptrdiff_t src_stride, const uint8_t *pred_ptr, ptrdiff_t pred_stride);
+ 
+ #if 0
+ uint64_t vpx_sum_squares_2d_i16_c(const int16_t *src, int stride, int size);
+@@ -1376,8 +1376,8 @@ static void setup_rtcd_internal(uint32_t asm_type)
+     vpx_sub_pixel_variance8x8 = vpx_sub_pixel_variance8x8_c;
+     if (flags & HAS_SSSE3) vpx_sub_pixel_variance8x8 = vpx_sub_pixel_variance8x8_ssse3;
+ #endif
+-    vpx_subtract_block = eb_vp9_subtract_block_c;
+-    if (flags & HAS_SSE2) vpx_subtract_block = eb_vp9_subtract_block_sse2;
++    svt_vpx_subtract_block = eb_vp9_subtract_block_c;
++    if (flags & HAS_SSE2) svt_vpx_subtract_block = eb_vp9_subtract_block_sse2;
+ #if 0
+     vpx_sum_squares_2d_i16 = vpx_sum_squares_2d_i16_c;
+     if (flags & HAS_SSE2) vpx_sum_squares_2d_i16 = vpx_sum_squares_2d_i16_sse2;
