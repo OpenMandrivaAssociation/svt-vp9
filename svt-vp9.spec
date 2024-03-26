@@ -6,8 +6,8 @@
 
 Name:           svt-vp9
 Version:        0.3.0
-Release:        2
-Summary:        Scalable Video Technology for VP9 Encoder and Decoder
+Release:        3
+Summary:        Scalable Video Technology for VP9 Encoder
 Group:          System/Libraries
 License:        BSD-2-Clause-Patent and ISC
 URL:            https://github.com/OpenVisualCloud/SVT-VP9
