@@ -79,7 +79,7 @@ pushd gstreamer-plugin
 popd
 
 %files
-%doc Docs/svt-vp9_encoder_user_guide.md
+%doc Docs/*
 %{_bindir}/SvtVp9EncApp
 
 %files -n %{libpackage}
