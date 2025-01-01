@@ -4,26 +4,19 @@
 
 %define oname   SVT-VP9
 
-%define tag     0.3.0
+%define commit  1feb760a60bf519973610ad58001273cb55c7d26
 
 # https://github.com/OpenVisualCloud/SVT-VP9/issues/159
 ExclusiveArch:  %{x86_64}
 
 Name:           svt-vp9
-Version:        %{tag}+20230719
-Release:        1
+Version:        0.3.1
+Release:        0.20250101.1
 Summary:        Scalable Video Technology for VP9 Encoder
 Group:          System/Libraries
 License:        BSD-2-Clause-Patent and ISC
 URL:            https://github.com/OpenVisualCloud/SVT-VP9
-Source0:        https://github.com/OpenVisualCloud/SVT-VP9/archive/v%{tag}/%{oname}-%{tag}.tar.gz
-Patch0:         789981ddec6348f30072c745096e4d2820eca018.patch
-Patch1:         d46acba4668817b2963fa55546a7b4f565c66120.patch
-Patch2:         b82f651176122d64b199d755622e436e19b36d40.patch
-Patch3:         1b08a141204b500e64458c1a92f95b3898013674.patch
-Patch4:         15bd454a0ce53d1432a4f8a89df08774a26237e3.patch
-Patch5:         bab25a6e1ab9e77de0f1916ee7ac8cb2c7ebe23c.patch
-Patch6:         04d2685bd4cb87bdc01e1222214f8fca1e1cd036.patch
+Source0:        https://github.com/OpenVisualCloud/SVT-VP9/archive/%{commit}.tar.gz
 
 BuildRequires:  cmake
 BuildRequires:  meson
@@ -65,7 +58,7 @@ This package provides %{name}-based GStreamer plug-in.
 
 
 %prep
-%autosetup -p1 -n %{oname}-%{tag}
+%autosetup -p1 -n %{oname}-%{commit}
 # Patch build gstreamer plugin
 sed -e "s|install: true,|install: true, include_directories : [ include_directories('../Source/API') ], link_args : '-lSvtVp9Enc',|" \
 -e "/svtvp9enc_dep =/d" -e 's|, svtvp9enc_dep||' -e "s|svtvp9enc_dep.found()|true|" -i gstreamer-plugin/meson.build
