@@ -4,14 +4,14 @@
 
 %define oname   SVT-VP9
 
-%define commit  1feb760a60bf519973610ad58001273cb55c7d26
+%define commit  f5039ec08465e21b15131f6bdc97bfa250ded1c9
 
 # https://github.com/OpenVisualCloud/SVT-VP9/issues/159
 ExclusiveArch:  %{x86_64}
 
 Name:           svt-vp9
 Version:        0.3.1
-Release:        0.20250101.1
+Release:        0.20250531.1
 Summary:        Scalable Video Technology for VP9 Encoder
 Group:          System/Libraries
 License:        BSD-2-Clause-Patent and ISC
