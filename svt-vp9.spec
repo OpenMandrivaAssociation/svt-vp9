@@ -10,8 +10,8 @@
 ExclusiveArch:  %{x86_64}
 
 Name:           svt-vp9
-Version:        0.3.1
-Release:        0.20250531.1
+Version:        0.3.0
+Release:        0.20250531.2
 Summary:        Scalable Video Technology for VP9 Encoder
 Group:          System/Libraries
 License:        BSD-2-Clause-Patent and ISC
