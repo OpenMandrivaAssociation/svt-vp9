@@ -10,13 +10,13 @@
 ExclusiveArch:  %{x86_64}
 
 Name:           svt-vp9
-Version:        0.3.0
-Release:        0.20250531.2
+Version:        0.3.1
+Release:        1
 Summary:        Scalable Video Technology for VP9 Encoder
 Group:          System/Libraries
 License:        BSD-2-Clause-Patent and ISC
 URL:            https://github.com/OpenVisualCloud/SVT-VP9
-Source0:        https://github.com/OpenVisualCloud/SVT-VP9/archive/%{commit}.tar.gz
+Source0:        https://github.com/OpenVisualCloud/SVT-VP9/archive/%{version}/%{oname}-%{version}.tar.gz
 
 BuildRequires:  cmake
 BuildRequires:  meson
@@ -58,7 +58,7 @@ This package provides %{name}-based GStreamer plug-in.
 
 
 %prep
-%autosetup -p1 -n %{oname}-%{commit}
+%autosetup -p1 -n %{oname}-%{version}
 # Patch build gstreamer plugin
 sed -e "s|install: true,|install: true, include_directories : [ include_directories('../Source/API') ], link_args : '-lSvtVp9Enc',|" \
 -e "/svtvp9enc_dep =/d" -e 's|, svtvp9enc_dep||' -e "s|svtvp9enc_dep.found()|true|" -i gstreamer-plugin/meson.build
